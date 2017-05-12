@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间应该是对应接口的包名+接口名 -->
+<mapper namespace="com.demo.dao.IUserDao">
+    <!--查询用户信息并分页 -->
+    <select id="queryUserPager" resultType="com.demo.model.UserExtend">
+        select t.user_id,t.user_name,t.user_sex,date_format(t.user_birthday,'%Y-%m-%d')user_birthday,
+        t.user_email,t.user_edu,t.user_telephone,t.user_address,p.codedesc as user_sex_desc,
+        p1.codedesc as user_edu_desc
+        from `user` t inner join dict p on t.user_sex=p.code and p.field='SEX' 
+        inner join dict p1 on t.user_edu = p1.code and p1.field = 'EDU'
+        order by t.create_time desc
+        limit #{skip},#{size}
+    </select>
+      
+      <!--查询用户总数 -->
+    <select id="queryUserCount" resultType="int">
+        select count(*) from `user`
+    </select>
+    
+    <!--根据用户id查询用户 -->
+    <select id="queryUserById" parameterType="int" resultType="com.demo.model.User">
+        select user_id,user_name,user_sex,date_format(user_birthday,'%Y-%m-%d')user_birthday,
+        user_email,user_edu,user_telephone,user_address from `user` where user_id=#{user_id}
+    </select>
+    
+    <!--新增用户 -->
+    <insert id="insertUser" parameterType="com.demo.model.User">
+        insert into `user`(user_name,user_sex,user_birthday,user_email,user_edu,user_telephone,user_address,
+            create_time) 
+        values(#{user_name},#{user_sex},str_to_date(#{user_birthday},'%Y-%m-%d'),#{user_email},#{user_edu},
+            #{user_telephone},#{user_address},now());
+    </insert>
+    
+    <!--编辑用户 -->
+    <update id="updateUser" parameterType="com.demo.model.User">
+        update `user` 
+        set user_name=#{user_name},user_sex=#{user_sex},user_birthday=str_to_date(#{user_birthday},'%Y-%m-%d'),
+        user_email=#{user_email},user_edu=#{user_edu},user_telephone=#{user_telephone},user_address=#{user_address} 
+        where user_id=#{user_id}
+    </update>
+    
+    <!--根据用户id删除用户 -->
+    <delete id="deleteUserById" parameterType="int">
+       delete from `user` where user_id=#{user_id}
+    </delete>
+    
+    <!--删除多个用户 -->
+    <delete id="deleteUsers" parameterType="java.util.List">
+       delete from `user` where user_id in
+       <!-- <foreach>标签有循环的功能，可以用来生成有规律的SQL语句，主要属性有：
+        item：表示集合每一个元素进行迭代时的别名
+        index：表示在迭代过程中，每次迭代到的位置
+        open：表示该语句以什么开始
+        separator：表示每次迭代之间以什么符号作为分隔
+        close：表示该语句以什么结束
+        collection：要循环的集合 -->
+       <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+           #{item}
+         </foreach>
+    </delete>
+</mapper>

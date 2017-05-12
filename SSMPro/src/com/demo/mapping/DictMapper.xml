@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间应该是对应接口的包名+接口名 -->
+<mapper namespace="com.demo.dao.IDictDao">
+    <!--根据字段获取字典 -->
+    <select id="getDictByField" parameterType="java.lang.String" resultType="com.demo.model.Dict">
+       select code,codedesc from dict 
+       where field=#{value} and enabled='1' 
+       order by sortno
+    </select>
+
+</mapper>
